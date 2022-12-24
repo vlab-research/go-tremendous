@@ -52,17 +52,49 @@ var createCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		key := os.Getenv("TREMENDOUS_API_KEY")
+		base := os.Getenv("TREMENDOUS_BASE_URL")
 
-		base := "https://testflight.tremendous.com"
 		client := tremendous.NewClient(http.DefaultClient, base, key)
 
+		funding, err := cmd.Flags().GetString("funding")
+		if err != nil {
+			return err
+		}
+
+		products, err := cmd.Flags().GetStringSlice("products")
+		if err != nil {
+			return err
+		}
+
+		amount, err := cmd.Flags().GetFloat64("amount")
+		if err != nil {
+			return err
+		}
+
+		currency, err := cmd.Flags().GetString("currency")
+		if err != nil {
+			return err
+		}
+
+		delivery, err := cmd.Flags().GetString("delivery")
+		if err != nil {
+			return err
+		}
+
+		name, err := cmd.Flags().GetString("name")
+		if err != nil {
+			return err
+		}
+
 		orders, err := client.Orders.Create(
-			"AYXFGRP96E6G",
-			[]string{"TBAJH7YLFVS5"},
-			10.0,
-			"USD",
-			"LINK",
-			tremendous.Recipient{Name: "Study Participant"},
+			funding,
+			products,
+			amount,
+			currency,
+			delivery,
+
+			// TODO: add optional email/phone
+			tremendous.Recipient{Name: name},
 		)
 
 		if err != nil {
@@ -78,6 +110,13 @@ var createCmd = &cobra.Command{
 func init() {
 	ordersCmd.AddCommand(listCmd)
 	ordersCmd.AddCommand(createCmd)
+
+	createCmd.Flags().String("funding", "", "funding")
+	createCmd.Flags().StringSlice("products", []string{}, "products")
+	createCmd.Flags().Float64("amount", 0.0, "amount")
+	createCmd.Flags().String("currency", "", "currency")
+	createCmd.Flags().String("delivery", "", "delivery")
+	createCmd.Flags().String("name", "", "name")
 
 	rootCmd.AddCommand(ordersCmd)
 

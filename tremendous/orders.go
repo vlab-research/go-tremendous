@@ -59,16 +59,16 @@ type Order struct {
 	InvoiceID  string    `json:"invoice_id,omitempty"`
 }
 
-type OrdersResponse struct {
+type ListOrdersResponse struct {
 	Orders     []Order `json:"orders"`
 	TotalCount int     `json:"total_count"`
 }
 
-type CreateResponse struct {
+type CreateOrderResponse struct {
 	Order Order `json:"order"`
 }
 
-type CreateRequest struct {
+type CreateOrderRequest struct {
 	ExternalID string   `json:"external_id"`
 	Payment    Payment  `json:"payment"`
 	Rewards    []Reward `json:"rewards"`
@@ -80,8 +80,8 @@ func newOrdersService(t *Tremendous) *OrdersService {
 	}
 }
 
-func (o *OrdersService) List() (*OrdersResponse, error) {
-	resp := &OrdersResponse{}
+func (o *OrdersService) List() (*ListOrdersResponse, error) {
+	resp := &ListOrdersResponse{}
 	_, err := o.base.Request("orders", "GET", nil, resp)
 	return resp, err
 }
@@ -93,9 +93,9 @@ func (o *OrdersService) Create(
 	currency string,
 	delivery string,
 	recipient Recipient,
-) (*CreateResponse, error) {
+) (*CreateOrderResponse, error) {
 
-	params := &CreateRequest{
+	params := &CreateOrderRequest{
 		Payment: Payment{
 			FundingSourceID: funding,
 		},
@@ -114,7 +114,7 @@ func (o *OrdersService) Create(
 		},
 	}
 
-	resp := &CreateResponse{}
+	resp := &CreateOrderResponse{}
 	_, err := o.base.Request("orders", "POST", params, resp)
 
 	return resp, err
